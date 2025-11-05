@@ -7,10 +7,10 @@ canvas.width = 800;
 canvas.height = 500;
 
 // Game Constants
-const GRAVITY = 0.6;
-const JUMP_STRENGTH = -12;
-const MOVE_SPEED = 5;
-const FRICTION = 0.8;
+const GRAVITY = 0.5;
+const JUMP_STRENGTH = -10;
+const MOVE_SPEED = 3;
+const FRICTION = 0.85;
 
 // Game State
 let gameState = {
@@ -73,42 +73,61 @@ class Player {
     }
 
     draw() {
-        // Gregory's body (brown skin tone)
-        ctx.fillStyle = '#8B5A3C';
-        ctx.fillRect(this.x, this.y + 15, this.width, 25);
+        // Pixel art style - using only rectangles for blocky look
 
-        // Gregory's head
-        ctx.fillStyle = '#A0694D';
-        ctx.beginPath();
-        ctx.arc(this.x + this.width / 2, this.y + 10, 12, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Hair (black)
+        // Hair (black) - top of head
         ctx.fillStyle = '#1a1a1a';
-        ctx.beginPath();
-        ctx.arc(this.x + this.width / 2, this.y + 5, 13, Math.PI, 0);
-        ctx.fill();
+        ctx.fillRect(this.x + 6, this.y, 18, 8);
 
-        // Eyes
+        // Gregory's head (brown skin tone) - blocky square head
+        ctx.fillStyle = '#A0694D';
+        ctx.fillRect(this.x + 6, this.y + 6, 18, 12);
+
+        // Eyes (white with black pupils)
         ctx.fillStyle = 'white';
         if (this.isFacingRight) {
-            ctx.fillRect(this.x + this.width / 2 + 2, this.y + 8, 4, 3);
+            ctx.fillRect(this.x + 16, this.y + 10, 4, 3);
+            // Pupil
+            ctx.fillStyle = 'black';
+            ctx.fillRect(this.x + 18, this.y + 11, 2, 2);
         } else {
-            ctx.fillRect(this.x + this.width / 2 - 6, this.y + 8, 4, 3);
+            ctx.fillRect(this.x + 10, this.y + 10, 4, 3);
+            // Pupil
+            ctx.fillStyle = 'black';
+            ctx.fillRect(this.x + 10, this.y + 11, 2, 2);
         }
 
-        // Shirt (red - vibrant color)
+        // Mouth (simple line)
+        ctx.fillStyle = '#8B5A3C';
+        ctx.fillRect(this.x + 12, this.y + 15, 6, 2);
+
+        // Neck
+        ctx.fillStyle = '#A0694D';
+        ctx.fillRect(this.x + 11, this.y + 18, 8, 3);
+
+        // Shirt (red - vibrant color) - blocky rectangular body
         ctx.fillStyle = '#e74c3c';
-        ctx.fillRect(this.x + 5, this.y + 20, this.width - 10, 12);
+        ctx.fillRect(this.x + 5, this.y + 21, 20, 10);
 
-        // Pants (blue)
+        // Arms
+        ctx.fillStyle = '#e74c3c';
+        ctx.fillRect(this.x + 2, this.y + 22, 3, 8); // Left arm
+        ctx.fillRect(this.x + 25, this.y + 22, 3, 8); // Right arm
+
+        // Hands
+        ctx.fillStyle = '#A0694D';
+        ctx.fillRect(this.x + 2, this.y + 29, 3, 3);
+        ctx.fillRect(this.x + 25, this.y + 29, 3, 3);
+
+        // Pants (blue) - blocky legs
         ctx.fillStyle = '#3498db';
-        ctx.fillRect(this.x + 5, this.y + 32, this.width - 10, 8);
+        ctx.fillRect(this.x + 7, this.y + 31, 7, 7);  // Left leg
+        ctx.fillRect(this.x + 16, this.y + 31, 7, 7); // Right leg
 
-        // Shoes (black)
+        // Shoes (black) - blocky pixel shoes
         ctx.fillStyle = '#2c3e50';
-        ctx.fillRect(this.x + 2, this.y + 38, 12, 4);
-        ctx.fillRect(this.x + this.width - 14, this.y + 38, 12, 4);
+        ctx.fillRect(this.x + 6, this.y + 38, 8, 2);  // Left shoe
+        ctx.fillRect(this.x + 16, this.y + 38, 8, 2); // Right shoe
     }
 
     die() {
@@ -145,14 +164,25 @@ class Platform {
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
 
-        // Platform border
-        ctx.strokeStyle = '#229954';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(this.x, this.y, this.width, this.height);
-
-        // Grass texture
+        // Grass top layer (bright green)
         ctx.fillStyle = '#2ecc71';
-        ctx.fillRect(this.x, this.y, this.width, 4);
+        ctx.fillRect(this.x, this.y, this.width, 3);
+
+        // Add pixel art grass blades on top
+        ctx.fillStyle = '#27ae60';
+        for (let i = 0; i < this.width; i += 8) {
+            ctx.fillRect(this.x + i + 2, this.y - 2, 2, 3);
+            ctx.fillRect(this.x + i + 5, this.y - 3, 2, 4);
+        }
+
+        // Platform border (darker outline)
+        ctx.fillStyle = '#1e8449';
+        // Left border
+        ctx.fillRect(this.x, this.y, 2, this.height);
+        // Right border
+        ctx.fillRect(this.x + this.width - 2, this.y, 2, this.height);
+        // Bottom border
+        ctx.fillRect(this.x, this.y + this.height - 2, this.width, 2);
     }
 
     checkCollision(player) {
@@ -197,32 +227,31 @@ class Coin {
 
     draw() {
         if (!this.collected) {
-            this.rotation += 0.1;
+            // Pixel art style coin - simple animated square
+            const size = 12;
+            const offset = Math.abs(Math.sin(this.rotation)) * 3;
+            this.rotation += 0.05; // Slower rotation for pixel art
 
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.rotate(this.rotation);
-
-            // Outer circle (gold)
+            // Outer square (gold)
             ctx.fillStyle = '#f39c12';
-            ctx.beginPath();
-            ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.fillRect(this.x - size/2, this.y - size/2, size, size);
 
-            // Inner circle (yellow)
+            // Inner square (yellow) - slightly smaller
             ctx.fillStyle = '#f1c40f';
-            ctx.beginPath();
-            ctx.arc(0, 0, this.radius - 3, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.fillRect(this.x - (size-4)/2, this.y - (size-4)/2, size-4, size-4);
 
-            // Center symbol
+            // Center pixel
             ctx.fillStyle = '#f39c12';
-            ctx.font = 'bold 12px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('$', 0, 0);
+            ctx.fillRect(this.x - 1, this.y - 1, 3, 3);
 
-            ctx.restore();
+            // Add a simple animation effect - side pixels
+            if (offset > 1.5) {
+                ctx.fillStyle = '#f1c40f';
+                ctx.fillRect(this.x - 2, this.y - 3, 1, 1);
+                ctx.fillRect(this.x + 2, this.y - 3, 1, 1);
+                ctx.fillRect(this.x - 2, this.y + 3, 1, 1);
+                ctx.fillRect(this.x + 2, this.y + 3, 1, 1);
+            }
         }
     }
 
@@ -444,37 +473,54 @@ document.getElementById('restartButton').addEventListener('click', () => {
 
 // Draw background
 function drawBackground() {
-    // Sky gradient
+    // Sky gradient (pixel art style - simple two-tone)
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
     gradient.addColorStop(0, '#87CEEB');
     gradient.addColorStop(1, '#E0F6FF');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Clouds
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-    ctx.beginPath();
-    ctx.arc(150, 80, 30, 0, Math.PI * 2);
-    ctx.arc(180, 80, 40, 0, Math.PI * 2);
-    ctx.arc(210, 80, 30, 0, Math.PI * 2);
-    ctx.fill();
+    // Pixel art clouds - blocky rectangles
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
 
-    ctx.beginPath();
-    ctx.arc(550, 120, 25, 0, Math.PI * 2);
-    ctx.arc(580, 120, 35, 0, Math.PI * 2);
-    ctx.arc(610, 120, 25, 0, Math.PI * 2);
-    ctx.fill();
+    // Cloud 1
+    ctx.fillRect(140, 75, 20, 15);
+    ctx.fillRect(130, 80, 10, 10);
+    ctx.fillRect(160, 80, 15, 10);
+    ctx.fillRect(175, 75, 20, 15);
+    ctx.fillRect(145, 70, 15, 10);
+    ctx.fillRect(160, 68, 20, 10);
 
-    // Sun
+    // Cloud 2
+    ctx.fillRect(540, 115, 20, 15);
+    ctx.fillRect(530, 120, 10, 10);
+    ctx.fillRect(560, 120, 15, 10);
+    ctx.fillRect(575, 115, 15, 15);
+    ctx.fillRect(550, 110, 15, 10);
+
+    // Pixel art sun - blocky square sun
     ctx.fillStyle = '#f39c12';
-    ctx.beginPath();
-    ctx.arc(700, 60, 35, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillRect(685, 45, 30, 30);
 
+    // Sun inner glow
     ctx.fillStyle = '#f1c40f';
-    ctx.beginPath();
-    ctx.arc(700, 60, 28, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillRect(690, 50, 20, 20);
+
+    // Sun rays (simple pixel style)
+    ctx.fillStyle = '#f39c12';
+    // Top ray
+    ctx.fillRect(698, 35, 4, 8);
+    // Bottom ray
+    ctx.fillRect(698, 77, 4, 8);
+    // Left ray
+    ctx.fillRect(673, 58, 8, 4);
+    // Right ray
+    ctx.fillRect(719, 58, 8, 4);
+    // Diagonal rays
+    ctx.fillRect(677, 38, 5, 5);
+    ctx.fillRect(718, 38, 5, 5);
+    ctx.fillRect(677, 72, 5, 5);
+    ctx.fillRect(718, 72, 5, 5);
 }
 
 // Game Loop
