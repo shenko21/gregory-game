@@ -3,29 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gregory's Adventure - A Platformer Game</title>
+    <title>Gregory's Epic Adventure - Ultimate Edition</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="game-container">
         <div class="header">
-            <h1>Gregory's Adventure</h1>
+            <h1>Gregory's Epic Adventure</h1>
             <div class="game-info">
                 <span>Score: <span id="score">0</span></span>
                 <span>Lives: <span id="lives">3</span></span>
                 <span>Level: <span id="level">1</span></span>
+                <span id="timeDisplay" class="hidden">Time: <span id="time">0:00</span></span>
+            </div>
+            <div class="power-ups-bar">
+                <span id="shieldIndicator" class="power-up-indicator hidden">🛡️ Shield</span>
+                <span id="doubleJumpIndicator" class="power-up-indicator hidden">🪽 Double Jump</span>
+                <span id="speedIndicator" class="power-up-indicator hidden">⚡ Speed</span>
+                <span id="magnetIndicator" class="power-up-indicator hidden">🧲 Magnet</span>
+                <span id="flyIndicator" class="power-up-indicator hidden">✨ Fly</span>
             </div>
         </div>
 
-        <canvas id="gameCanvas"></canvas>
-
-        <div class="controls-info">
-            <p><strong>Controls:</strong> Arrow Keys to Move | Space to Jump</p>
+        <!-- Boss Health Bar -->
+        <div id="bossHealthBar" class="boss-health-bar hidden">
+            <div class="boss-name" id="bossName">Boss Name</div>
+            <div class="health-bar-container">
+                <div class="health-bar" id="bossHealth"></div>
+            </div>
         </div>
 
+        <!-- Main Canvas -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Mobile Controls -->
+        <div id="mobileControls" class="mobile-controls hidden">
+            <button class="control-btn" id="btnLeft">←</button>
+            <button class="control-btn" id="btnRight">→</button>
+            <button class="control-btn jump-btn" id="btnJump">Jump</button>
+        </div>
+
+        <!-- Controls Info -->
+        <div class="controls-info">
+            <p><strong>Controls:</strong> Arrow Keys to Move | Space to Jump | P to Pause</p>
+            <p class="achievements-hint">🏆 <span id="achievementCount">0</span>/15 Achievements Unlocked</p>
+        </div>
+
+        <!-- Story Dialogue Box -->
+        <div id="dialogueBox" class="dialogue-box hidden">
+            <div class="dialogue-content">
+                <div class="dialogue-character" id="dialogueCharacter"></div>
+                <div class="dialogue-text" id="dialogueText"></div>
+                <button class="dialogue-button" id="dialogueNext">Next →</button>
+            </div>
+        </div>
+
+        <!-- Game Message / Menu -->
         <div id="gameMessage" class="game-message hidden">
             <h2 id="messageText"></h2>
-            <button id="restartButton">Play Again</button>
+            <div id="menuButtons">
+                <button id="restartButton" class="menu-btn">Play Again</button>
+                <button id="customizeButton" class="menu-btn">Customize</button>
+                <button id="achievementsButton" class="menu-btn">Achievements</button>
+                <button id="leaderboardButton" class="menu-btn">Leaderboard</button>
+            </div>
+        </div>
+
+        <!-- Character Customization Panel -->
+        <div id="customizePanel" class="panel hidden">
+            <h2>Customize Gregory</h2>
+            <div class="customize-options">
+                <h3>Shirt Color:</h3>
+                <div class="color-picker">
+                    <button class="color-btn" data-shirt="#e74c3c">Red</button>
+                    <button class="color-btn" data-shirt="#3498db">Blue</button>
+                    <button class="color-btn" data-shirt="#2ecc71">Green</button>
+                    <button class="color-btn" data-shirt="#9b59b6">Purple</button>
+                    <button class="color-btn" data-shirt="#f39c12">Orange</button>
+                </div>
+                <h3>Pants Color:</h3>
+                <div class="color-picker">
+                    <button class="color-btn" data-pants="#3498db">Blue</button>
+                    <button class="color-btn" data-pants="#2c3e50">Black</button>
+                    <button class="color-btn" data-pants="#27ae60">Green</button>
+                    <button class="color-btn" data-pants="#8e44ad">Purple</button>
+                    <button class="color-btn" data-pants="#c0392b">Red</button>
+                </div>
+            </div>
+            <button id="closeCustomize" class="menu-btn">Close</button>
+        </div>
+
+        <!-- Achievements Panel -->
+        <div id="achievementsPanel" class="panel hidden">
+            <h2>🏆 Achievements</h2>
+            <div id="achievementsList" class="achievements-list"></div>
+            <button id="closeAchievements" class="menu-btn">Close</button>
+        </div>
+
+        <!-- Leaderboard Panel -->
+        <div id="leaderboardPanel" class="panel hidden">
+            <h2>🏅 Leaderboard</h2>
+            <div id="leaderboardList" class="leaderboard-list"></div>
+            <button id="closeLeaderboard" class="menu-btn">Close</button>
+        </div>
+
+        <!-- Achievement Notification -->
+        <div id="achievementNotification" class="achievement-notification hidden">
+            <div class="achievement-icon">🏆</div>
+            <div class="achievement-info">
+                <div class="achievement-title">Achievement Unlocked!</div>
+                <div class="achievement-name" id="achievementName"></div>
+            </div>
         </div>
     </div>
 
